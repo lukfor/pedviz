@@ -1,0 +1,87 @@
+<project name="pedvizapi" default="all" basedir=".">
+    
+    
+    <!-- Init -->
+	<target name="init">
+
+		<property name="version" value="0.1"/>	
+		<property name="base-dir" value="./"/>	
+		<property name="lib-dir" value="${base-dir}/lib"/>		
+		<property name="dist-dir" value="${base-dir}/dist/"/>	
+		<property name="res-dir" value="${base-dir}/res/"/>			
+		<property name="files-dir" value="${base-dir}/files/"/>			
+		<property name="zipname" value="${dist-dir}/pedviz_demo_${version}_figure.zip"/>			
+
+		<!-- directories -->
+		<property name="source-dir" value="${base-dir}/src/"/>			
+		<!-- dist-directories -->			
+		<property name="dist-bin-dir" value="${base-dir}/dist/bin"/>	
+		<property name="dist-source-dir" value="${dist-dir}/src"/>
+		<property name="dist-lib-dir" value="${dist-dir}/"/>
+		<property name="dist-res-dir" value="${dist-dir}/res"/>
+		<property name="dist-files-dir" value="${dist-dir}/"/>		
+    </target>
+    
+    
+    
+	<!-- Clean -->
+	<target name="clean" depends="init">
+		<delete dir="${dist-dir}"/>
+	</target> 
+  
+  
+  
+	<!-- Create Dist-Directorys -->
+	<target name="dist" depends="init, clean">
+		<mkdir dir="${dist-source-dir}"/>
+		<mkdir dir="${dist-lib-dir}"/>
+		<mkdir dir="${dist-bin-dir}"/>
+		<mkdir dir="${dist-res-dir}"/>		
+		<mkdir dir="${dist-files-dir}"/>		
+		
+			<copy todir="${dist-lib-dir}">
+			  <fileset dir="${lib-dir}"/>
+			</copy>		
+		
+		<copy todir="${dist-source-dir}">
+		  <fileset dir="${source-dir}"/>
+		</copy>		
+		
+		<copy todir="${dist-res-dir}">
+		  <fileset dir="${res-dir}"/>
+		</copy>		
+
+		<copy todir="${dist-files-dir}">
+		  <fileset dir="${files-dir}"/>
+		</copy>				
+			
+	</target>
+	
+	
+  
+	<!-- Compile pedviz + demos and create jar-files -->  
+	<target name="compile" depends="dist">
+		<javac srcdir="${source-dir}/"
+           destdir="${dist-bin-dir}"
+           classpath="${dist-lib-dir}/pedviz_j3d_0.15.jar;${dist-lib-dir}/vldocking_2.1.4.jar" target="1.5"/>
+       
+		<jar jarfile="${dist-dir}/pedviz_demo.jar"
+			 basedir="${dist-bin-dir}"
+		/>			 
+	</target>
+	
+	<!-- Create zip-file -->    
+	<target name="zip" depends="compile">
+		<zip zipfile="${zipname}"
+			 basedir="${dist-dir}"
+			 whenempty="create"
+			 excludes="${dist-dir}/bin/*.*"
+		/>                              
+	</target>	
+
+	<!-- run all tasks -->
+	<target name="all" depends="zip">
+	</target>
+
+
+</project>

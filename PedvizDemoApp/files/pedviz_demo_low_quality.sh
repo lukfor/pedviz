@@ -1,0 +1,1 @@
+java -mx512m -cp "pedviz_j3d_0.15.jar:vldocking_2.1.4.jar:postgresql-8.2-505.jdbc4.jar:pedviz_demo.jar" core.DemoApp -no_transparency -no_antialiasing -no_light -low_quality
