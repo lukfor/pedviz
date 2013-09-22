@@ -1,0 +1,122 @@
+<!--
+ * Copyright © 2007 by Christian Fuchsberger and Lukas Forer info@pedvizapi.org.
+ * All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License <http://www.pedvizapi.org/gpl.txt>
+ * for more details. 
+ -->
+
+<project name="pedvizapi" default="all" basedir=".">
+    
+    
+    <!-- Init -->
+	<target name="init">
+
+		<property name="version" value="0.15"/>	
+		<property name="base-dir" value="./"/>	
+		<property name="dist-dir" value="${base-dir}/dist/"/>	
+		<property name="zipname" value="${dist-dir}/pedviz_${version}.zip"/>
+		<property name="tarname" value="${dist-dir}/pedviz_${version}.tgz"/>		
+		<property name="zipname_doc" value="${dist-dir}/java_doc_${version}.zip"/>		
+		<property name="libname" value="${dist-dir}/pedviz_${version}.jar"/>	
+		<property name="libname_j3d" value="${dist-dir}/pedviz_j3d_${version}.jar"/>			
+		<property name="libname_obf" value="${dist-dir}/pedviz_${version}_obf.jar"/>	
+		<property name="libname_j3d_obf" value="${dist-dir}/pedviz_j3d_${version}_obf.jar"/>			
+
+		<!-- directories -->
+		<property name="source-dir" value="${base-dir}/src/"/>
+		<property name="lib-dir" value="${base-dir}/lib"/>
+		<property name="javadoc-dir" value="${base-dir}/doc"/>
+		<property name="csv-dir" value="${base-dir}/csv"/>		
+		<!-- dist-directories -->
+		<property name="dist-bin-dir" value="${base-dir}/dist/bin"/>	
+		<property name="dist-source-dir" value="${dist-dir}/src"/>
+		<property name="dist-lib-dir" value="${dist-dir}/lib"/>
+		<property name="dist-javadoc-dir" value="${dist-dir}/doc"/>				
+		<!-- obf -->	
+		<property name="libname_obf" value="${dist-dir}/pedviz_${version}_obf.jar"/>	
+		<property name="libname_j3d_obf" value="${dist-dir}/pedviz_j3d_${version}_obf.jar"/>			
+    </target>
+    
+	<!-- Clean -->
+	<target name="clean" depends="init">
+		<delete dir="${dist-dir}"/>
+	</target> 
+  
+	<!-- Create Dist-Directorys -->
+	<target name="dist" depends="init, clean">
+
+		<mkdir dir="${dist-source-dir}"/>
+		<mkdir dir="${dist-lib-dir}"/>
+		<mkdir dir="${dist-javadoc-dir}"/>
+		<mkdir dir="${dist-bin-dir}"/>
+		
+		<copy todir="${dist-source-dir}">
+		  <fileset dir="${source-dir}"/>
+		</copy>
+	
+		<copy todir="${dist-lib-dir}">
+		  <fileset dir="${lib-dir}"/>
+		</copy>
+   
+	</target>
+  
+	<!-- Compile pedviz + demos and create jar-files -->  
+	<target name="compile" depends="dist">
+		<javac srcdir="${source-dir}/pedviz/"
+           destdir="${dist-bin-dir}"
+           classpath="${dist-lib-dir}/mysql-connector-java-3.1.12-bin.jar"  target="1.5" />
+			
+ 		<jar jarfile="${libname}"
+			 basedir="${dist-bin-dir}"
+			 excludes="pedviz/view/symbols3d/**,pedviz/view/j3d/**,pedviz/view/**3D**,pedviz/rpedviz/RPedviz3D**"
+		/>
+		<jar jarfile="${libname_j3d}"
+			 basedir="${dist-bin-dir}"
+			 includes="**"/>                    
+	</target>
+	
+	<!-- Create zip-file -->    
+	<target name="zip" depends="compile, javadoc, init">
+		<zip destfile="${zipname}"
+			 basedir="${dist-dir}"> 
+			<fileset dir="." includes="README.txt, README, family_32.csv"  excludes="${dist-bin-dir}/*"/>			
+		</zip>     
+		
+		<tar destfile="${tarname}" compression="gzip" basedir="${dist-dir}">
+					<fileset dir="." includes="README.txt, README, family_32.csv"  excludes="${dist-bin-dir}/*, ${zipname}"/>
+		</tar>
+			
+
+		</target>
+
+	<!-- Create javadoc -->    
+	<target name="javadoc" depends="dist">
+		<javadoc packagenames="pedviz.*"
+			public="true"
+			excludepackagenames="pedviz.view.j3d/, pedviz.algorithms.magiceye"
+			sourcepath="${dist-source-dir}/"
+			classpath="${dist-lib-dir}/mysql-connector-java-3.1.12-bin.jar"
+			destdir="${dist-javadoc-dir}" 
+		/>
+		
+		<zip destfile="${zipname_doc}"
+			 basedir="${dist-javadoc-dir}"> 		
+		</zip>   
+		
+	</target>
+	
+	
+	<!-- run all tasks -->
+	<target name="all" depends="zip">
+	</target>
+
+
+</project>
